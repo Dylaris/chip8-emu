@@ -1,0 +1,39 @@
+se va, 10       ; 3xkk
+se v1, v2       ; 5xy0
+
+sne vf, 255     ; 4xkk
+sne v3, v8      ; 9xy0
+
+ld v3, 23       ; 6xkk
+ld v1, v2       ; 8xy0
+ld vc, dt       ; Fx07
+ld vb, K        ; Fx0A
+ld v4, [I]      ; Fx65
+ld dt, va       ; Fx15
+ld st, v3       ; Fx18
+ld I, 0x98      ; Annn
+ld F, vd        ; Fx29
+ld B, v1        ; Fx33
+ld [I], v2      ; Fx55
+
+add v4, 0x12    ; 7xkk
+add v4, v8      ; 8xy4
+add I, v9       ; Fx1E
+
+or v1, v3       ; 8xy1
+
+and v1, v3      ; 8xy2
+
+xor v1, v3      ; 8xy3
+
+sub v1, v9      ; 8xy5
+
+shr v1, v2      ; 8xy6
+
+subn v3, v6     ; 8xy7
+
+shl v1, v2      ; 8xyE
+
+jp v0, 0x12     ; Bnnn
+
+rnd v1, 0x78    ; Cxkk

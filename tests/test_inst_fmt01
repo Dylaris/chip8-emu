@@ -1,0 +1,6 @@
+sys 16      ; 0nnn
+l1:
+jp 0x30     ; 1nnn
+call l1     ; 2nnn
+skp v2      ; Ex9E
+sknp va     ; ExA1
