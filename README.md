@@ -2,7 +2,7 @@
 - Make an assembler for Chip8 and use the assembler to translate test file into machine code.
 - Make a Chip8 interpreter (emulator) to execute the machine code generated before.
 
-## Specifications
+## Spec
 ### Memory
 - 4KB RAM (0x000 - 0xFFF)
 - The beginning 512 bytes (0x200) is reserved for interpreter.
@@ -11,7 +11,7 @@
 Memory Map:
 +---------------+= 0xFFF (4095) End of Chip-8 RAM
 |               |
-| 0xEA0 to 0xEFF|
+| 0xF00 to 0xFFF|
 |Display refresh|
 |     region    |
 |               |
@@ -93,3 +93,27 @@ In Chip8 instruction, we use some specifial bit-field to represent some object:
 - x - A 4-bit value, the lower 4 bits of the high byte of the instruction
 - y - A 4-bit value, the upper 4 bits of the low byte of the instruction
 - kk or byte - An 8-bit value, the lowest 8 bits of the instruction
+
+| Instruction | Pseudo-Code |
+| --- | --- |
+| 0NNN | |
+| 00EE | PC = Stack[SP--] |
+| 1NNN | PC = NNN |
+| 2NNN | Stack[SP++] = PC; PC = NNN |
+| 6XNN | VX = NN |
+| 7XNN | VX += NN |
+| 8XY0 | VX = VY |
+| 8XY1 | VX |= VY |
+| 8XY2 | VX &= VY |
+| 8XY3 | VX ^= VY |
+| 8XY4 | VX += VY; <br>if carry then VF = 1 else VF = 0 |
+| 8XY5 | VY -= VX; <br>if borrow then VF = 0 else VF = 1 |
+| 8XY6 | VF = VY & 0x01; VY >>= 1; VX = VY |
+| 8XY7 | VX = VY - VX; <br>if borrow then VF = 0 else VF = 1 |
+| 8XYE | VF = VY & 0x80; VY >>= 1; VX = VY |
+| BNNN | PC = NNN + V0 |
+| CXNN | VX = (rand() % 0xFF) & NN |
+| 3XNN | Skip the following instruction if the value of register VX equals NN
+| 5XY0 | Skip the following instruction if the value of register VX is equal to the value of register VY
+| 4XNN | Skip the following instruction if the value of register VX is not equal to NN
+| 9XY0 | Skip the following instruction if the value of register VX is not equal to the value of register VY
