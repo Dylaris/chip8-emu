@@ -97,9 +97,13 @@ In Chip8 instruction, we use some specifial bit-field to represent some object:
 | Instruction | Pseudo-Code |
 | --- | --- |
 | 0NNN | |
+| 00E0 | clear screen -> set all pixel to 0 |
 | 00EE | PC = Stack[SP--] |
 | 1NNN | PC = NNN |
 | 2NNN | Stack[SP++] = PC; PC = NNN |
+| 3XNN | if VX == NN then PC += 2 |
+| 4XNN | if VX != NN then PC += 2 |
+| 5XY0 | if VX == VY then PC += 2 |
 | 6XNN | VX = NN |
 | 7XNN | VX += NN |
 | 8XY0 | VX = VY |
@@ -111,9 +115,19 @@ In Chip8 instruction, we use some specifial bit-field to represent some object:
 | 8XY6 | VF = VY & 0x01; VY >>= 1; VX = VY |
 | 8XY7 | VX = VY - VX; <br>if borrow then VF = 0 else VF = 1 |
 | 8XYE | VF = VY & 0x80; VY >>= 1; VX = VY |
+| 9XY0 | if VX != VY then PC += 2 |
+| ANNN | I = NNN |
 | BNNN | PC = NNN + V0 |
 | CXNN | VX = (rand() % 0xFF) & NN |
-| 3XNN | Skip the following instruction if the value of register VX equals NN
-| 5XY0 | Skip the following instruction if the value of register VX is equal to the value of register VY
-| 4XNN | Skip the following instruction if the value of register VX is not equal to NN
-| 9XY0 | Skip the following instruction if the value of register VX is not equal to the value of register VY
+| DXYN | if collison then VF = 1 else VF = 0 |
+| EX9E | Key = VX; if Press(Key) then PC += 2 |
+| EXA1 | Key = VX; if !Press(Key) then PC += 2 |
+| FX07 | VX = DT |
+| FX0A | while !AnyKeyPress; VX = Key |
+| FX15 | DT = VX |
+| FX18 | ST = VX |
+| FX1E | I += VX |
+| FX29 | I = FONT_BASE + VX * 5 |
+| FX33 | [I] = VX >> 8; <br>[I + 1] = VX >> 4; <br>[I + 2] = VX >> 0 |
+| FX55 | [I] = V0; <br>[I + 1] = V1; <br>... <br>[I + X] = VX; <br>I = I + X + 1 |
+| FX65 | V0 = [I]; <br>V1 = [I + 1]; <br>... <br>VX = [I + X]; <br>I = I + X + 1 |
