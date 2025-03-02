@@ -2,10 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define ERR(msg) do { \
-        fprintf(stderr, "error: %s\n", msg); \
-        exit(1); \
-    } while (0)
 
 typedef struct file_content {
     u8 *buf;
@@ -39,8 +35,8 @@ int main(int argc, char **argv)
     if (argc != 2) 
         ERR("<USE>: ./chip8 program");
 
-    file_content result = ReadFile(argv[1]);
-    chip8_vm *vm = Chip8_New(result.buf, result.size);
+    file_content content = ReadFile(argv[1]);
+    chip8_vm *vm = Chip8_New(content.buf, content.size);
 
     free(vm);
     return 0;

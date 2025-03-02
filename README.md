@@ -101,24 +101,24 @@ In Chip8 instruction, we use some specifial bit-field to represent some object:
 | 00EE | PC = Stack[SP--] |
 | 1NNN | PC = NNN |
 | 2NNN | Stack[SP++] = PC; PC = NNN |
-| 3XNN | if VX == NN then PC += 2 |
-| 4XNN | if VX != NN then PC += 2 |
+| 3XNN | if VX == KK then PC += 2 |
+| 4XNN | if VX != KK then PC += 2 |
 | 5XY0 | if VX == VY then PC += 2 |
-| 6XNN | VX = NN |
-| 7XNN | VX += NN |
+| 6XNN | VX = KK |
+| 7XNN | VX += KK |
 | 8XY0 | VX = VY |
-| 8XY1 | VX |= VY |
+| 8XY1 | VX \|= VY |
 | 8XY2 | VX &= VY |
 | 8XY3 | VX ^= VY |
 | 8XY4 | VX += VY; <br>if carry then VF = 1 else VF = 0 |
-| 8XY5 | VY -= VX; <br>if borrow then VF = 0 else VF = 1 |
+| 8XY5 | VX -= VY; <br>if borrow then VF = 0 else VF = 1 |
 | 8XY6 | VF = VY & 0x01; VY >>= 1; VX = VY |
 | 8XY7 | VX = VY - VX; <br>if borrow then VF = 0 else VF = 1 |
-| 8XYE | VF = VY & 0x80; VY >>= 1; VX = VY |
+| 8XYE | VF = VY & 0x80; VY <<= 1; VX = VY |
 | 9XY0 | if VX != VY then PC += 2 |
 | ANNN | I = NNN |
 | BNNN | PC = NNN + V0 |
-| CXNN | VX = (rand() % 0xFF) & NN |
+| CXNN | VX = (rand() % 0xFF) & KK |
 | DXYN | if collison then VF = 1 else VF = 0 |
 | EX9E | Key = VX; if Press(Key) then PC += 2 |
 | EXA1 | Key = VX; if !Press(Key) then PC += 2 |
