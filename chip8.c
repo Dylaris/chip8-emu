@@ -182,7 +182,7 @@ static void op_F(Chip8 *vm, u8 *vx, u8 suffix)
 int exec(Chip8 *vm)
 {
     if (vm->wait_key == 1) return EXEC_WAIT;
-    if (vm->pc > 0x200 + vm->_size) return EXEC_END;
+    if (vm->pc >= 0x200 + vm->_size) return EXEC_END;
 
     u16 opcode = (vm->ram[vm->pc] << 8) | vm->ram[vm->pc + 1];
     vm->pc += 2;
