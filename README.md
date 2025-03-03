@@ -98,7 +98,7 @@ In Chip8 instruction, we use some specifial bit-field to represent some object:
 | --- | --- |
 | 0NNN | |
 | 00E0 | clear screen -> set all pixel to 0 |
-| 00EE | PC = Stack[SP--] |
+| 00EE | PC = Stack[--SP] |
 | 1NNN | PC = NNN |
 | 2NNN | Stack[SP++] = PC; PC = NNN |
 | 3XNN | if VX == KK then PC += 2 |
@@ -112,9 +112,9 @@ In Chip8 instruction, we use some specifial bit-field to represent some object:
 | 8XY3 | VX ^= VY |
 | 8XY4 | VX += VY; <br>if carry then VF = 1 else VF = 0 |
 | 8XY5 | VX -= VY; <br>if borrow then VF = 0 else VF = 1 |
-| 8XY6 | VF = VY & 0x01; VY >>= 1; VX = VY |
+| 8XY6 | VF = VY & 0x01; VX = VY >> 1 |
 | 8XY7 | VX = VY - VX; <br>if borrow then VF = 0 else VF = 1 |
-| 8XYE | VF = VY & 0x80; VY <<= 1; VX = VY |
+| 8XYE | VF = VY & 0x80; VX = VY << 1|
 | 9XY0 | if VX != VY then PC += 2 |
 | ANNN | I = NNN |
 | BNNN | PC = NNN + V0 |

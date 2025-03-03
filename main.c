@@ -3,12 +3,12 @@
 #include <stdlib.h>
 
 
-typedef struct file_content {
+typedef struct FileContent {
     u8 *buf;
     long size;
-} file_content;
+} FileContent;
 
-static file_content ReadFile(const char *filename)
+static FileContent read_file(const char *filename)
 {
     FILE *file = fopen(filename, "rb");
     if (file == NULL) ERR("open file");
@@ -23,7 +23,7 @@ static file_content ReadFile(const char *filename)
     size_t read = fread(buf, 1, length, file);
     if (read != (size_t) length) ERR("read bytes");
 
-    file_content result = {};
+    FileContent result = {};
     result.buf = buf;
     result.size = length;
 
@@ -35,8 +35,9 @@ int main(int argc, char **argv)
     if (argc != 2) 
         ERR("<USE>: ./chip8 program");
 
-    file_content content = ReadFile(argv[1]);
-    chip8_vm *vm = Chip8_New(content.buf, content.size);
+    FileContent content = read_file(argv[1]);
+    Chip8 *vm = new(content.buf, content.size);
+    while (exec(vm) != EXEC_END);
 
     free(vm);
     return 0;

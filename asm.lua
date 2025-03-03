@@ -8,7 +8,7 @@ end
 local function match_bytes(line)
     local byte_stream = {}
     line = ignore_comment(line)
-    line = line:gsub("^%s*byte%s*", "") or line:gsub("^%s*BYTE%s*", "")
+    line = line:gsub("^%s*.byte%s*", "") or line:gsub("^%s*.BYTE%s*", "")
 
     if line ~= "" then
         local str = line:match('"([^"]+)"')
@@ -35,7 +35,7 @@ local consts = {}
 -- define foo 12
 local function match_const(line)
     line = ignore_comment(line)
-    line = line:gsub("^%s*define%s*", "") or line:gsub("^%s*DEFINE%s*", "")
+    line = line:gsub("^%s*.define%s*", "") or line:gsub("^%s*.DEFINE%s*", "")
     if line ~= "" then
         local name = line:match("^%s*([%w%.%-%_]+)")
         line = line:gsub("^%s*(%w+)%s*", "")
@@ -53,14 +53,14 @@ local function parse_label_and_const(file)
     for line in file:lines() do
         line = ignore_comment(line)
         if line ~= "" then
-            local label = line:match("^%s*([%w%.%-%_]+):")
+            local label = line:match("^%s*([%w%.%-%_%@]+):")
             local pseudo_code = line:match("^%s*([%w%.%-%_]+)")
             if label then
                 labels[label] = offset
-            elseif pseudo_code == "byte" or pseudo_code == "BYTE" then
+            elseif pseudo_code == ".byte" or pseudo_code == ".BYTE" then
                 local byte_stream = match_bytes(line)
                 offset = offset + ((#byte_stream == 0) and 2 or #byte_stream)
-            elseif pseudo_code == "define" or pseudo_code == "DEFINE" then
+            elseif pseudo_code == ".define" or pseudo_code == ".DEFINE" then
                 match_const(line)
             else
                 offset = offset + 2
@@ -94,7 +94,7 @@ end
 
 local function is_inst(line)
     local o = line:match("^%s*(%w+)")
-    if line:match("^%s*(%w+):") or equal(o, "byte") or equal(o, "define") then
+    if line:match("^%s*(%w+):") or equal(o, ".byte") or equal(o, ".define") then
         return false
     end
     return true
@@ -337,5 +337,5 @@ local function debug()
     end
 end
 
-debug()
--- assembler()
+-- debug()
+assembler()

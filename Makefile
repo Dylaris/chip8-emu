@@ -1,5 +1,5 @@
 CC = gcc
-CFLAG = -Wall -Wextra -std=c99
+CFLAG = -Wall -Wextra -std=c99 -g
 
 SRC = chip8.c main.c
 OBJ = $(SRC:.c=.o)

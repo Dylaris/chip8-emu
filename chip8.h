@@ -20,22 +20,22 @@
 typedef uint8_t  u8;
 typedef uint16_t u16;
 
-typedef struct chip8_vm {
+typedef struct Chip8 {
     u8 ram[RAM_SZ];
     u16 *_stack;
     u8 *screen;
-    u16 _size;     // free use memory size
+    u16 _size; // free use memory size
 
     u8 v[16], dt, st, sp;
     u16 i, pc;
 
-    u8 keyState[16]; 
-    u8 waitKey, waitReg;
-} chip8_vm;
+    u8 key_state[16]; 
+    u8 wait_key, wait_reg;
+} Chip8;
 
-chip8_vm *Chip8_New(const u8 *prog, const long size);
-int Chip8_Exec(chip8_vm *vm);
-int Chip8_GetPixel(chip8_vm *vm, u8 x, u8 y);
+Chip8 *new(const u8 *prog, const long size);
+int exec(Chip8 *vm);
+int get_pixel(Chip8 *vm, u8 x, u8 y);
 
 #define ERR(msg) do { \
         fprintf(stderr, "error: %s at %d in %s\n", msg, __LINE__, __FILE__); \
