@@ -51,7 +51,7 @@ int get_pixel(Chip8 *vm, u8 x, u8 y)
 {
     u8 byte_idx = (y * WIDTH + x) / 8;
     u8 bit_off  = (y * WIDTH + x) % 8;
-    return vm->screen[byte_idx] & (0x80 >> bit_off);
+    return (vm->screen[byte_idx] >> (7 - bit_off)) & 0x1;
 }
 
 static void set_pixel(Chip8 *vm, u8 x, u8 y, u8 on)
@@ -129,7 +129,7 @@ static void op_D(Chip8 *vm, u8 start_x, u8 start_y, u8 n)
         u8 sprite_byte = vm->ram[vm->i];
         for (int x = start_x; x < end_x; x++) {
             u8 off = (x - start_x) % 8;
-            u8 sprite_pixel = sprite_byte & (0x80 >> off);
+            u8 sprite_pixel = (sprite_byte >> (7 - off)) & 0x1;
             u8 screen_pixel = get_pixel(vm, x, y);
 
             if (sprite_pixel) {

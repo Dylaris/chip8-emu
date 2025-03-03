@@ -49,12 +49,16 @@ Memory Map:
 16 16-bit values, store the return address when finished a subroutine
 
 ### Input
-chip8 uses 16-key hexadecimal keyboard:
-|1|2|3|C|
-|---|---|---|---|
-|4|5|6|D|
-|7|8|9|E|
-|A|0|B|F|
+chip8 uses 16-key hexadecimal keyboard
+
+```
+key mapping:
+
+1 2 3 C        1 2 3 4
+4 5 6 D   ->   Q W E R
+7 8 9 E        A S D F
+A 0 B F        Z X C V
+```
 
 ### Display
 chip8 uses 64x32-pixel monochrome display.
