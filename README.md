@@ -116,9 +116,9 @@ In Chip8 instruction, we use some specifial bit-field to represent some object:
 | 8XY3 | VX ^= VY |
 | 8XY4 | VX += VY; <br>if carry then VF = 1 else VF = 0 |
 | 8XY5 | VX -= VY; <br>if borrow then VF = 0 else VF = 1 |
-| 8XY6 | VF = VY & 0x01; VX = VY >> 1 |
+| 8XY6 | VF = (VX >> 0) & 0x01; VX = VY >> 1 |
 | 8XY7 | VX = VY - VX; <br>if borrow then VF = 0 else VF = 1 |
-| 8XYE | VF = VY & 0x80; VX = VY << 1|
+| 8XYE | VF = (VX >> 7) & 0x01; VX = VY << 1|
 | 9XY0 | if VX != VY then PC += 2 |
 | ANNN | I = NNN |
 | BNNN | PC = NNN + V0 |
@@ -132,6 +132,13 @@ In Chip8 instruction, we use some specifial bit-field to represent some object:
 | FX18 | ST = VX |
 | FX1E | I += VX |
 | FX29 | I = FONT_BASE + VX * 5 |
-| FX33 | [I] = VX >> 8; <br>[I + 1] = VX >> 4; <br>[I + 2] = VX >> 0 |
-| FX55 | [I] = V0; <br>[I + 1] = V1; <br>... <br>[I + X] = VX; <br>I = I + X + 1 |
-| FX65 | V0 = [I]; <br>V1 = [I + 1]; <br>... <br>VX = [I + X]; <br>I = I + X + 1 |
+| FX33 | [I] = (VX / 100) % 10; <br>[I + 1] = (VX / 10) % 10; <br>[I + 2] = (VX / 1) % 10 |
+| FX55 | [I] = V0; <br>[I + 1] = V1; <br>... <br>[I + X] = VX |
+| FX65 | V0 = [I]; <br>V1 = [I + 1]; <br>... <br>VX = [I + X] |
+
+#### Confusion
+1. For `FX55` and `FX65`, there is no clear definition stating that we should increment I by X + 1.
+
+2. For `8XY6` and `8XYE`, I believe VF should store the LSB or MSB of VY, but my implementation stores the LSB or MSB of VX.
+
+I am following the approach validated by the BC_text.ch8 test file.

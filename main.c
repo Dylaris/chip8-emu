@@ -91,6 +91,7 @@ static void loop(Chip8 *vm, int scale)
             switch (evt.type) {
             case SDL_QUIT:
                 destroy();
+                free(vm);
                 return;
             case SDL_KEYDOWN:
                 if (vm->wait_key) {
@@ -139,7 +140,6 @@ static FileContent read_file(const char *filename)
     return result;
 }
 
-
 int main(int argc, char **argv)
 {
     if (argc != 2) 
@@ -154,6 +154,5 @@ int main(int argc, char **argv)
     init(SCALE);
     loop(vm, SCALE);
 
-    free(vm);
     return 0;
 }

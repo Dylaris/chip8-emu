@@ -98,7 +98,7 @@ static void op_8(u8 *vx, u8 *vy, u8 *vf, u8 suffix)
         *vx -= *vy;
     } break;
     case 0x6: {
-        *vf = *vy & 0x01;
+        *vf = (*vx >> 0) & 0x01;
         *vx = *vy >> 1;
     } break;
     case 0x7: {
@@ -106,10 +106,9 @@ static void op_8(u8 *vx, u8 *vy, u8 *vf, u8 suffix)
         *vx = *vy - *vx;
     } break;
     case 0xE: {
-        *vf = *vy & 0x80;
+        *vf = (*vx >> 7) & 0x01;
         *vx = *vy << 1;
     } break;
-    default:
     }
 }
 static void op_9(Chip8 *vm, u8 *vx, u8 *vy) { if (*vx != *vy) vm->pc += 2; }
@@ -145,7 +144,6 @@ static void op_E(Chip8 *vm, u8 *vx, u8 suffix)
     switch (suffix) {
     case 0x1: vm->pc = (key_press == 1) ? vm->pc + 2 : vm->pc; break;
     case 0xE: vm->pc = (key_press == 0) ? vm->pc + 2 : vm->pc; break;
-    default:
     }
     if (key_press == 1) vm->key_state[*vx] = 0;
 }
@@ -159,23 +157,20 @@ static void op_F(Chip8 *vm, u8 *vx, u8 suffix)
     case 0x1E: vm->i += *vx; break;
     case 0x29: vm->i = 0x0 + (*vx) * 5; break;
     case 0x33: {
-        vm->ram[vm->i + 0] = *vx >> 8;
-        vm->ram[vm->i + 1] = *vx >> 4;
-        vm->ram[vm->i + 2] = *vx >> 0;
+        vm->ram[vm->i + 0] = (*vx / 100) % 10;
+        vm->ram[vm->i + 1] = (*vx / 10 ) % 10;
+        vm->ram[vm->i + 2] = (*vx / 1  ) % 10;
     } break;
     case 0x55: {
         u8 count = vx - vm->v + 1;
         for (int off = 0; off < count; off++)
             vm->ram[vm->i + off] = vm->v[off];
-        vm->i += count;
     } break;
     case 0x65: {
         u8 count = vx - vm->v + 1;
         for (int off = 0; off < count; off++)
             vm->v[off] = vm->ram[vm->i + off];
-        vm->i += count;
     } break;
-    default:
     } 
 }
 
@@ -208,15 +203,14 @@ int exec(Chip8 *vm)
     case 0x5: op_5(vm, vx, vy); break;
     case 0x6: op_6(vx, kk);     break;
     case 0x7: op_7(vx, kk);     break;
-    case 0x8: op_8(vx, vy, vf, opcode >> 12); break;
+    case 0x8: op_8(vx, vy, vf, opcode & 0xF); break;
     case 0x9: op_9(vm, vx, vy); break;
     case 0xA: op_A(vm, nnn);    break;
     case 0xB: op_B(vm, nnn);    break;
     case 0xC: op_C(vx, kk);     break;
     case 0xD: op_D(vm, vx, vy, n); break;
-    case 0xE: op_E(vm, vx, opcode >> 12); break;
-    case 0xF: op_F(vm, vx, opcode >> 8);  break;
-    default:
+    case 0xE: op_E(vm, vx, opcode & 0xF); break;
+    case 0xF: op_F(vm, vx, opcode & 0xFF);  break;
     }
 
     return EXEC_OK;
