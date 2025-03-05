@@ -8,7 +8,7 @@ TARGET = chip8-vm
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $^ -o $@
+	$(CC) $^ -o $@ -lSDL2
 
 %.o: %.c
 	$(CC) $(CFLAG) -c $< -o $@

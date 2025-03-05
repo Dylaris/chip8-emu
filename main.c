@@ -1,14 +1,60 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <SDL2/SDL.h>
 #include "chip8.h"
 
 #define INVALID_KEY -1
 
 typedef struct {
+    SDL_Window *win;
+    SDL_Renderer *renderer;
+} sdl_handle;
+
+typedef struct {
     u8 *buf;
     long size;
 } FileContent;
+
+sdl_handle g_sdl;
+
+static void init(int scale)
+{
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) ERR(SDL_GetError());
+
+    g_sdl.win = SDL_CreateWindow("Chip-8 Emulator",
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        WIDTH * scale, HEIGHT * scale, SDL_WINDOW_SHOWN);
+    if (!g_sdl.win) ERR(SDL_GetError());
+
+    g_sdl.renderer = SDL_CreateRenderer(g_sdl.win, -1, SDL_RENDERER_ACCELERATED);
+    if (!g_sdl.renderer) ERR(SDL_GetError());
+}
+
+static void draw(Chip8 *vm, int scale)
+{
+    SDL_SetRenderDrawColor(g_sdl.renderer, 0, 0, 0, 255);
+    SDL_RenderClear(g_sdl.renderer);
+
+    for (u8 y = 0; y < HEIGHT; y++) {
+        for (u8 x = 0; x < WIDTH; x++) {
+            if (get_pixel(vm, x, y)) {
+                SDL_Rect rect = {x * scale, y * scale, scale, scale};
+                SDL_SetRenderDrawColor(g_sdl.renderer, 255, 255, 255, 255);
+                SDL_RenderFillRect(g_sdl.renderer, &rect);
+            }
+        }
+    }
+
+    SDL_RenderPresent(g_sdl.renderer);
+}
+
+static void destroy()
+{
+    SDL_DestroyRenderer(g_sdl.renderer);
+    SDL_DestroyWindow(g_sdl.win);
+    SDL_Quit();
+}
 
 static int key_map(int sdl_key)
 {
@@ -30,6 +76,45 @@ static int key_map(int sdl_key)
     case SDLK_c: return 0xB;
     case SDLK_v: return 0xF;
     default:     return INVALID_KEY;
+    }
+}
+
+static void loop(Chip8 *vm, int scale)
+{
+    exec(vm);
+
+    SDL_Event evt;
+
+    while (1) {
+        while (SDL_PollEvent(&evt) != 0) {
+            int key;
+            switch (evt.type) {
+            case SDL_QUIT:
+                destroy();
+                return;
+            case SDL_KEYDOWN:
+                if (vm->wait_key) {
+                    key = key_map(evt.key.keysym.sym);
+                    if (key == INVALID_KEY) break;
+                    vm->key_state[key] = 1;
+                    vm->v[vm->wait_reg] = key;
+                    vm->wait_key = 0;
+                }
+                break;
+            case SDL_KEYUP:
+                key = key_map(evt.key.keysym.sym);
+                if (key == INVALID_KEY) break;
+                vm->key_state[key] = 0;
+                break;
+            }
+        }
+
+        if (vm->dt > 0) vm->dt--;
+        if (vm->st > 0) vm->st--;
+
+        draw(vm, scale);
+
+        SDL_Delay(16);
     }
 }
 
@@ -65,7 +150,10 @@ int main(int argc, char **argv)
 
     FileContent content = read_file(argv[1]);
     Chip8 *vm = new(content.buf, content.size);
-    while (exec(vm) != EXEC_END);
+
+    const int SCALE = 15;
+    init(SCALE);
+    loop(vm, SCALE);
 
     free(vm);
     return 0;
