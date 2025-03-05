@@ -81,11 +81,11 @@ static int key_map(int sdl_key)
 
 static void loop(Chip8 *vm, int scale)
 {
-    exec(vm);
-
     SDL_Event evt;
 
     while (1) {
+        exec(vm);
+
         while (SDL_PollEvent(&evt) != 0) {
             int key;
             switch (evt.type) {
@@ -108,7 +108,6 @@ static void loop(Chip8 *vm, int scale)
                 break;
             }
         }
-
         if (vm->dt > 0) vm->dt--;
         if (vm->st > 0) vm->st--;
 

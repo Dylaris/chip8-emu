@@ -116,17 +116,17 @@ static void op_9(Chip8 *vm, u8 *vx, u8 *vy) { if (*vx != *vy) vm->pc += 2; }
 static void op_A(Chip8 *vm, u16 nnn) { vm->i = nnn; }
 static void op_B(Chip8 *vm, u16 nnn) { vm->pc = nnn + vm->v[0]; }
 static void op_C(u8 *vx, u8 kk) { *vx = (rand() % 0xFf) & kk; }
-static void op_D(Chip8 *vm, u8 start_x, u8 start_y, u8 n)
+static void op_D(Chip8 *vm, u8 *vx, u8 *vy, u8 n)
 {
-    start_x %= WIDTH;
-    start_y %= HEIGHT;
+    int start_x = *vx % WIDTH;
+    int start_y = *vy % HEIGHT;
     int end_x = MIN(start_x + 8, WIDTH);
     int end_y = MIN(start_y + n, HEIGHT);
 
     vm->v[0xF] = 0;
 
     for (int y = start_y; y < end_y; y++) {
-        u8 sprite_byte = vm->ram[vm->i];
+        u8 sprite_byte = vm->ram[vm->i + y - start_y];
         for (int x = start_x; x < end_x; x++) {
             u8 off = (x - start_x) % 8;
             u8 sprite_pixel = (sprite_byte >> (7 - off)) & 0x1;
@@ -213,7 +213,7 @@ int exec(Chip8 *vm)
     case 0xA: op_A(vm, nnn);    break;
     case 0xB: op_B(vm, nnn);    break;
     case 0xC: op_C(vx, kk);     break;
-    case 0xD: op_D(vm, x, y, n); break;
+    case 0xD: op_D(vm, vx, vy, n); break;
     case 0xE: op_E(vm, vx, opcode >> 12); break;
     case 0xF: op_F(vm, vx, opcode >> 8);  break;
     default:
